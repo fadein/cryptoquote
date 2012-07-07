@@ -1,4 +1,6 @@
 cryptoquote
 ===========
 
-Implementation of a dictionary-based algorithm to crack Crypoquote puzzles found on the funnies page
+A dictionary-based algorithm to crack the Cryptoquote puzzles found on the funnies page of most daily newspapers.
+
+Implemented in Chicken Scheme.
