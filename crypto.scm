@@ -16,6 +16,8 @@
 ; e.g. "gentoo"  -> "abcdee"
 ;      "level"   -> "abcba"
 ;      "pattern" -> "abccdef"
+;      "ain't"   -> "abc'd"
+;      "I'm"     -> "a'b"
 (define word->pattern
   (lambda (w)
 	(list->string
@@ -26,13 +28,14 @@
 			'()
 			(let ((h (car chars)))
 			  (cond
+				((not (char-alphabetic? h))
+				 (cons h (loop (cdr chars) letters)))
 				((assq h letters)
 				 => (lambda (r)
-					  (cons (cdr r) (loop (cdr chars)
-										  letters))))
+					  (cons (cdr r) (loop (cdr chars) letters))))
 				(else
 				  (let ((n (next-letter)))
 					(cons n (loop (cdr chars)
 								  (cons (cons h n) letters)))))))))))))
 
-;vim: set ft=scheme;
+; vim:set ft=scheme:
