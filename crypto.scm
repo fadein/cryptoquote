@@ -40,10 +40,10 @@
 								  (cons (cons h n) letters)))))))))))))
 
 ;Read a dictionary file and map each word to its pattern
-;Build up an alist keyed on these patterns
+;Build up a hash-table keyed on these patterns
 (define prepare-dictionary
   (lambda (filename)
-	(let ((alist '())
+	(let ((dict (make-hash-table))
 		  (size (file-size filename)))
 	  (with-input-from-file
 		filename
@@ -53,16 +53,21 @@
 				 (printf "\r~a/~a"
 						 (file-position (current-input-port)) size)
 				 (flush-output))
-			(if (eof-object? word)
-			  alist
-			  (let ((pattern (word->pattern word)))
-				(cond
-				  ((assoc pattern alist)
-				   => (lambda (match)
-						(append! match (list word))
-						(loop (read-line) (add1 lines))))
-				  (else
-					(set! alist (append alist (list (list pattern word))))
-					(loop (read-line) (add1 lines))))))))))))
+			(cond
+			  ((eof-object? word)
+			   (newline)
+			   dict)
+			  (else
+				(let ((pattern (word->pattern word)))
+				  (cond
+					((hash-table-exists? dict pattern)
+					 (hash-table-set!
+					   dict pattern
+					   (cons word (hash-table-ref dict pattern)))
+					 (loop (read-line) (add1 lines)))
+					(else
+					  (hash-table-set!
+						dict pattern (list word))
+					  (loop (read-line) (add1 lines)))))))))))))
 
 ; vim:set ft=scheme:
