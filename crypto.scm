@@ -3,15 +3,14 @@
 
 ; return a function that upon each invocation returns the next
 ; letter of the alphabet, #f when exhausted
-(define letter-seq
-  (lambda ()
+(define (letter-seq)
 	(let ((letters (string->list "abcdefghijklmnopqrstuvwxyz")))
 	  (lambda ()
 		(if (null? letters)
 		  #f
 		  (let ((h (car letters)))
 			(set! letters (cdr letters))
-			h))))))
+			h)))))
 
 ; map a word into a "pattern" highlighting repeated letters
 ; e.g. "gentoo"  -> "abcdee"
@@ -19,8 +18,7 @@
 ;      "pattern" -> "abccdef"
 ;      "ain't"   -> "abc'd"
 ;      "I'm"     -> "a'b"
-(define word->pattern
-  (lambda (w)
+(define (word->pattern w)
 	(list->string
 	  (let ((next-letter (letter-seq)))
 		(let loop ((chars (string->list (string-downcase w)))
@@ -37,12 +35,11 @@
 				(else
 				  (let ((n (next-letter)))
 					(cons n (loop (cdr chars)
-								  (cons (cons h n) letters)))))))))))))
+								  (cons (cons h n) letters))))))))))))
 
 ;Read a dictionary file and map each word to its pattern
 ;Build up a hash-table keyed on these patterns
-(define prepare-dictionary
-  (lambda (filename)
+(define (prepare-dictionary filename)
 	(let ((dict (make-hash-table))
 		  (size (file-size filename)))
 	  (with-input-from-file
@@ -68,6 +65,6 @@
 					(else
 					  (hash-table-set!
 						dict pattern (list word))
-					  (loop (read-line) (add1 lines)))))))))))))
+					  (loop (read-line) (add1 lines))))))))))))
 
 ; vim:set ft=scheme:
