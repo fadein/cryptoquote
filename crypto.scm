@@ -46,13 +46,14 @@
 		filename
 		(lambda ()
 		  (let loop ((word (read-line)) (lines 1))
-			(and (= 0 (remainder lines 500))
-				 (printf "\r~a/~a"
-						 (file-position (current-input-port)) size)
-				 (flush-output))
+			(and (= 0 (remainder lines 5000))
+				 (let* ((position (file-position (current-input-port)))
+						(percent (* 100 (/ position size))))
+				   (printf "\r~a" (fmt #f "Preparing dictionary " (num percent 10 2) "%"))
+				   (flush-output)))
 			(cond
 			  ((eof-object? word)
-			   (newline)
+			   (print "\rPreparing dictionary 100.00%")
 			   dict)
 			  (else
 				(let ((pattern (word->pattern word)))
@@ -66,5 +67,26 @@
 					  (hash-table-set!
 						dict pattern (list word))
 					  (loop (read-line) (add1 lines))))))))))))
+
+(define char-set:crypto
+  (string->char-set "abcdefghijklmnopqrstuvwxyz'"))
+
+(define (quote->patterns quot)
+  (map (lambda (s) (word->pattern s))
+	   (string-tokenize (string-downcase quot) char-set:crypto)))
+
+; cryptoquote strategies:
+; http://www.cryptoquote.org/strategies.html
+
+; more ideas:
+; http://www.gtoal.com/wordgames/cryptograms.html
+(define sample-quote
+  "Ubty lzm vz dy xzq j kzg dyrtqadtu, D rbdyn j vzzs rbdyv rz jen de dx rbtl tatq oqtee pbjqvte.")
+
+(define sample-solution
+  "When you go in for a job interview, I think a good thing to ask is if they ever press charges.")
+
+
+
 
 ; vim:set ft=scheme:
